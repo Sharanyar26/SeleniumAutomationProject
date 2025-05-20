@@ -9,11 +9,14 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.MutableCapabilities;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
@@ -22,6 +25,7 @@ import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
 import com.aventstack.extentreports.reporter.ExtentSparkReporter;
 
+import Utilities.ConfigReader;
 import Utilities.Extentmanager;
 
 public class BaseClass {
@@ -30,27 +34,43 @@ public class BaseClass {
 	public static ExtentTest test;
 	@SuppressWarnings("deprecation")
 	@BeforeClass
-	public void setUp() 
-	{
-			extent = Extentmanager.getInstance();
-		    ChromeOptions options = new ChromeOptions();
-		    options.addArguments("--disable-features=PasswordManagerEnabled,AutofillServerCommunication");
-		    options.addArguments("--incognito");
+	public void setUp() {
+	    String browser = ConfigReader.getProperty("browser");
 
-		    Map<String, Object> prefs = new HashMap<>();
-		    prefs.put("credentials_enable_service", false);
-		    prefs.put("profile.password_manager_enabled", false);
-		    options.setExperimentalOption("prefs", prefs);
-			driver=new ChromeDriver(options);
-			driver.get("https://automationexercise.com/");
-			driver.manage().window().maximize();
-			
-			
-			driver.manage().timeouts().pageLoadTimeout(500, TimeUnit.SECONDS);
-			driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-			
-			
+	    WebDriver driver = null;
+	    MutableCapabilities options = null;
+
+	    if (browser.equalsIgnoreCase("chrome")) {
+	        ChromeOptions chromeOptions = new ChromeOptions();
+	        chromeOptions.addArguments("--headless");
+	        chromeOptions.addArguments("--disable-features=PasswordManagerEnabled,AutofillServerCommunication");
+	        chromeOptions.addArguments("--incognito");
+
+	        Map<String, Object> prefs = new HashMap<>();
+	        prefs.put("credentials_enable_service", false);
+	        prefs.put("profile.password_manager_enabled", false);
+	        chromeOptions.setExperimentalOption("prefs", prefs);
+
+	        driver = new ChromeDriver(chromeOptions);
+
+	    } else if (browser.equalsIgnoreCase("edge")) {
+	        EdgeOptions edgeOptions = new EdgeOptions();
+	        //edgeOptions.addArguments("--headless");
+	        driver = new EdgeDriver(edgeOptions);
+
+	    } else {
+	        System.out.println("Browser not supported");
+	        return;
+	    }
+
+	    this.driver = driver; // assign to global driver if needed
+	    extent = Extentmanager.getInstance();
+	    driver.get("https://automationexercise.com/");
+	    driver.manage().window().maximize();
+	    driver.manage().timeouts().pageLoadTimeout(500, TimeUnit.SECONDS);
+	    driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 	}
+
 	
 	@AfterClass
 	public void tearDown() 
@@ -82,19 +102,5 @@ public class BaseClass {
 
 	}
 	
-//	public void CaptureScreen(String tname) 
-//	{
-//		String timestamp = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss").format(new Date());
-//		TakesScreenshot ts=(TakesScreenshot) driver;
-//		
-//		File sourcefile=ts.getScreenshotAs(OutputType.FILE);
-//		
-//		String Targetpath=System.getProperty("user.dir")+"\\screenshots\\"+tname+"_"+timestamp+".png";
-//		File targetfile=new File(Targetpath);
-//		
-//		sourcefile.renameTo(targetfile);
-//		return Targetpath;
-//		
-//	}
 	
 }

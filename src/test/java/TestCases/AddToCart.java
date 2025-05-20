@@ -16,8 +16,6 @@ import Utilities.ConfigReader;
 
 public class AddToCart extends BaseClass {
 	
-	
-	
 	@Test(priority=1)
 	public void login() 
 	{
@@ -30,7 +28,6 @@ public class AddToCart extends BaseClass {
 	String username = ConfigReader.getProperty("username");
     String password = ConfigReader.getProperty("password");
     l.loginDetails(username, password);
-//	l.loginDetails("shar@gmail.com", "12345678");
 	l.submit();
 	test.log(Status.PASS, "Login successful");
 		
@@ -66,15 +63,15 @@ public class AddToCart extends BaseClass {
 		 String testName = "verifyOrderConfirmation";
 		 	CartPage c = new CartPage(driver); 
 		 	try {
-		        Assert.assertFalse(c.isOrderConfirmed(), "Order confirmation message not displayed!");
+		        Assert.assertTrue(c.isOrderConfirmed(), "Order confirmation message not displayed!");
 		        System.out.println("Order confirmation validated successfully!");
-		    } catch (AssertionError e) {
+		    } 
+		 	catch (AssertionError e) 
+		 	{
 		        
 		        CaptureScreen(testName);
 		        throw e;
 		    }
-//		    Assert.assertTrue(c.isOrderConfirmed(), "Order confirmation message not displayed!");
-//		    System.out.println("Order confirmation validated successfully!");
 	 }
 
 }
